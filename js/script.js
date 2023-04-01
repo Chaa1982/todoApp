@@ -2,18 +2,17 @@ const input = document.querySelector("#todo-creation");
 const button = document.querySelector("#create-todo-button");
 const output = document.querySelector("#output");
 
-let todos = [
-    //уніс тестові данні
-    {
-       text: "first todo",
-       done: false,
-    },
-    {
-        text: "second todo",
-        done: false,
-    }
-];
-renderTodos(todos);//тестовий вивід на екран
+let todos = [];
+//перезаписав data localStorage при запуску програми
+saveTodosInLocaleStorage(todos);
+
+
+if(todos.length > 0) {
+    renderTodos(todos);//тестовий вивід на екран
+}else{
+    renderTodos(JSON.parse(localStorage.getItem("todos")));
+}
+
 
 button.onclick = () => {
 
@@ -24,7 +23,11 @@ button.onclick = () => {
     input.value = "";
 
     todo.text !== "" && todos.push(todo);
-
+    if(todos.length > 0){
+        localStorage.setItem("todos", JSON.stringify(todos));
+    }
+    //перезаписав data localStorage при додаванні нової задачі
+    saveTodosInLocaleStorage(todos);
     renderTodos(todos);
 }
 
@@ -47,6 +50,8 @@ function renderTodos (todosToRender) {
         checkbox.onchange = () => {
             const todo = todos[i];
             changeTodo(todo.text, !todo.done);
+            //перезаписав data localStorage при зміні статусу задачі
+            saveTodosInLocaleStorage(todos);
         }
     });
 
@@ -56,6 +61,8 @@ function renderTodos (todosToRender) {
         button.onclick = () => {
             const todo = todos[i];
             deleteTodo(todo.text);
+            //перезаписав data localStorage при видаленні задачі
+            saveTodosInLocaleStorage(todos);
         }
     })
 }
@@ -67,6 +74,7 @@ function changeTodo (text, newDone) {
         }
         return todo;
     });
+    
 
     renderTodos(todos);
 }
@@ -75,4 +83,11 @@ function deleteTodo (text) {
     todos = todos.filter((todo) => todo.text !== text);
 
     renderTodos(todos);
+}
+
+//функція запису (перезапису) todos у localeStorage
+function saveTodosInLocaleStorage(todos){
+    if(todos.length > 0){
+    localStorage.setItem("todos", JSON.stringify(todos));
+}
 }
