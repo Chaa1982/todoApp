@@ -2,16 +2,22 @@ const input = document.querySelector("#todo-creation");
 const button = document.querySelector("#create-todo-button");
 const output = document.querySelector("#output");
 
-let todos = [];
-//перезаписав data localStorage при запуску програми
-saveTodosInLocaleStorage(todos);
+const isLocalStorageTodosExists = localStorage.getItem("todos")
 
-
-if(todos.length > 0) {
-    renderTodos(todos);//тестовий вивід на екран
-}else{
-    renderTodos(JSON.parse(localStorage.getItem("todos")));
-}
+let todos = isLocalStorageTodosExists
+? JSON.parse(isLocalStorageTodosExists)
+:  [
+    {
+        text: "first todo",
+        done: false,
+    },
+    {
+        text: "second todo",
+        done: false,
+    },
+];
+console.log(`AllArr = ${todos.length}`, todos);
+renderTodos(todos)
 
 
 button.onclick = () => {
@@ -26,12 +32,12 @@ button.onclick = () => {
     if(todos.length > 0){
         localStorage.setItem("todos", JSON.stringify(todos));
     }
-    //перезаписав data localStorage при додаванні нової задачі
-    saveTodosInLocaleStorage(todos);
     renderTodos(todos);
 }
 
 function renderTodos (todosToRender) {
+localStorage.setItem("todos", JSON.stringify(todos));
+
     output.innerHTML = "";
     todosToRender.forEach((todo, i) => {
         output.innerHTML += `
@@ -50,8 +56,7 @@ function renderTodos (todosToRender) {
         checkbox.onchange = () => {
             const todo = todos[i];
             changeTodo(todo.text, !todo.done);
-            //перезаписав data localStorage при зміні статусу задачі
-            saveTodosInLocaleStorage(todos);
+            
         }
     });
 
@@ -61,8 +66,7 @@ function renderTodos (todosToRender) {
         button.onclick = () => {
             const todo = todos[i];
             deleteTodo(todo.text);
-            //перезаписав data localStorage при видаленні задачі
-            saveTodosInLocaleStorage(todos);
+            
         }
     })
 }
@@ -85,9 +89,4 @@ function deleteTodo (text) {
     renderTodos(todos);
 }
 
-//функція запису (перезапису) todos у localeStorage
-function saveTodosInLocaleStorage(todos){
-    if(todos.length > 0){
-    localStorage.setItem("todos", JSON.stringify(todos));
-}
-}
+
