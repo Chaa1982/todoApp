@@ -1,0 +1,27 @@
+body * {
+    font-size: 30px;
+}
+
+.todo {
+    border: 1px solid gray;
+    margin: 5px 0;
+    color: green;
+    transition: 0.3s all;
+}
+
+#create-todo-button:hover{
+    background: green;
+    color: white;
+}
+.done {
+    opacity: 0.5;
+    text-decoration: line-through;
+    color: red
+}
+.delete-todo{
+    float: right;
+}
+.delete-todo:hover{
+    background: red;
+    color: white;
+}
