@@ -1,24 +1,23 @@
 const input = document.querySelector("#todo-creation");
 const button = document.querySelector("#create-todo-button");
 const output = document.querySelector("#output");
+const usersOutput = document.querySelector("#users-output");
+const clearCurentUserButton = document.querySelector("#clear-curent-user");
+const searchTodoInput = document.querySelector("#todo-search");
 
 const isLocalStorageTodosExists = localStorage.getItem("todos")
 
-let todos = isLocalStorageTodosExists
-? JSON.parse(isLocalStorageTodosExists)
-:  [
-    {
-        text: "first todo",
-        done: false,
-    },
-    {
-        text: "second todo",
-        done: false,
-    },
-];
-console.log(`AllArr = ${todos.length}`, todos);
-renderTodos(todos)
 
+let todos = isLocalStorageTodosExists
+    ? JSON.parse(isLocalStorageTodosExists) : [];
+console.log(`AllArrTodo = ${todos.length}`, todos);
+renderTodos(todos);
+getServerUsers();
+
+let users = [];
+console.log(`AllArrUsers = ${users.length}`, users);
+
+let curentUser = undefined;
 
 button.onclick = () => {
 
@@ -42,9 +41,11 @@ localStorage.setItem("todos", JSON.stringify(todos));
     todosToRender.forEach((todo, i) => {
         output.innerHTML += `
         <div class="todo ${todo.done && "done"}">
-            <span>${i+1}.</span>
-            <input type="checkbox" ${todo.done && "checked"} class="todo-checkbox" />
-            <span>${todo.text}</span>
+            <div>
+                <span>${i+1}.</span>
+                <input type="checkbox" ${todo.done && "checked"} class="todo-checkbox" />
+                <span>${todo.text}</span>
+            </div>
             <button class="delete-todo">Delete</button>
         </div>
         `
@@ -78,15 +79,93 @@ function changeTodo (text, newDone) {
         }
         return todo;
     });
-    
-
-    renderTodos(todos);
+    renderTodos(curentUser ? todos.filter((todo) => todo.userId === curentUser.id) : todos);
 }
 
 function deleteTodo (text) {
     todos = todos.filter((todo) => todo.text !== text);
 
+    renderTodos(curentUser ? todos.filter((todo) => todo.userId === curentUser.id) : todos);
+}
+
+function searchTodo (value) {
+    const filteredTodo = curentUser 
+        ? todos.filter((todo) => todo.text.includes(value) && todo.userId === curentUser.id)
+        : todos.filter((todo) => todo.text.includes(value));
+    
+    renderTodos(filteredTodo);
+}
+
+function getServerTodos () {
+    fetch('https://jsonplaceholder.typicode.com/todos')
+        .then(response => response.json())
+        .then(todosFromServer => {
+            const transformedTodos = todosFromServer.map((todo) => {
+               return {
+                text: todo.title,
+                done: todo.completed,
+                userId: todo.userId,
+                id: todo.id,
+               };
+            });
+            
+            console.log("transform: ",transformedTodos);
+
+            todos = transformedTodos;
+            renderTodos(todos);
+            
+        });
+}
+
+function getServerUsers () {
+    fetch('https://jsonplaceholder.typicode.com/users')
+        .then(response => response.json())
+        .then(usersFromServer => {
+            console.log("users from server: ", usersFromServer)
+
+            users = usersFromServer;
+            renderUsres(users);
+        })
+}
+
+function renderUsres () {
+    usersOutput.innerHTML = "";
+    users.forEach((user) => {
+        usersOutput.innerHTML += `
+            <button class="user-todos-button">${user.name}</button></button>
+        `;
+    });
+
+    const userButtons = [...document.querySelectorAll(".user-todos-button")];
+
+    userButtons.forEach((button, i) => {
+        button.onclick = (event) => {
+            searchTodoInput.value = "";
+            curentUser = users[i];
+            clearCurentUserButton.disabled = false;
+
+            //щоб не було декільув видшдених кнопок, спочатку чистемо усі кнопки
+            userButtons.forEach((btn) => btn.classList.remove("active-user-button"));
+
+            //якщо натиснули на кнопку, то так денамічно добавляємо тегу ще один клас 
+            event.target.classList.add("active-user-button");
+
+            const todosOfCurentUser = todos.filter((todo) => todo.userId === curentUser.id)
+            renderTodos(todosOfCurentUser);
+        }
+    });
+}
+
+clearCurentUserButton.disabled = true;
+
+clearCurentUserButton.onclick = () => {
+    curentUser = undefined;
     renderTodos(todos);
+}
+
+searchTodoInput.oninput = () => {
+    console.log(searchTodoInput.value);
+    searchTodo(searchTodoInput.value)
 }
 
 

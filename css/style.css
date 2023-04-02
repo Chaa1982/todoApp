@@ -1,27 +1,71 @@
 body * {
     font-size: 30px;
+    
+}
+h1, header{
+    text-align: center;
+    margin-bottom: 2px;;
+}
+.user-todos-button{
+    background: #1894e72c;
+    border: 2px solid black;
+    margin: 3px;
+    border-radius: 10px;
+    transition: 0.2s linear;
+}
+.user-todos-button:hover{
+    border: 2px solid blue;
+    color: white;
+    margin: 2px;
 }
 
-.todo {
-    border: 1px solid gray;
-    margin: 5px 0;
-    color: green;
-    transition: 0.3s all;
+#todo-creation{
+    width: 780px;
 }
 
+#create-todo-button, #clear-curent-user{
+    background: #f0b10427;
+    transition: .3s linear;
+}
 #create-todo-button:hover{
     background: green;
     color: white;
 }
+#clear-curent-user:hover{
+    background: green;
+    color: white;
+}
+
+.todo {
+    
+    border: 1px solid gray;
+    background: lightgray;
+    margin: 5px 0;
+    padding: 5px;
+    display: flex;
+    justify-content: space-between;
+    color: green;
+    transition: 0.3s all;
+}
+
+
 .done {
     opacity: 0.5;
     text-decoration: line-through;
     color: red
 }
-.delete-todo{
-    float: right;
-}
+
 .delete-todo:hover{
     background: red;
     color: white;
+}
+
+.active-user-button{
+    background: blue;
+    color: white;
+}
+
+#todo-search{
+    margin: 5px 0;
+    width: 99%;
 }
