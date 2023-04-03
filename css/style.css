@@ -20,14 +20,15 @@ h1, header{
 }
 
 #todo-creation{
-    width: 780px;
+    width: 69%;
 }
 
-#create-todo-button, #clear-curent-user{
+#create-todo-button, #clear-curent-user, #clear-search-input{
     background: #f0b10427;
     transition: .3s linear;
 }
-#create-todo-button:hover{
+#create-todo-button:hover,
+#clear-search-input:hover{
     background: green;
     color: white;
 }
@@ -37,7 +38,7 @@ h1, header{
 }
 
 .todo {
-    
+    width: 95%;
     border: 1px solid gray;
     background: lightgray;
     margin: 5px 0;
@@ -48,6 +49,19 @@ h1, header{
     transition: 0.3s all;
 }
 
+#btn-up {
+    width: 70px;
+    height: 70px;
+    
+    position: absolute;
+    top: 30%;
+    left: 96%;
+    position: fixed;
+}
+#arrow-up {
+    width: 70px;
+    height: 70px;
+}
 
 .done {
     opacity: 0.5;
@@ -67,5 +81,5 @@ h1, header{
 
 #todo-search{
     margin: 5px 0;
-    width: 99%;
+    width: 76%;
 }

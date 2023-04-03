@@ -4,6 +4,8 @@ const output = document.querySelector("#output");
 const usersOutput = document.querySelector("#users-output");
 const clearCurentUserButton = document.querySelector("#clear-curent-user");
 const searchTodoInput = document.querySelector("#todo-search");
+const buttonUp = document.querySelector("#btn-up");
+const clearSearchInput = document.querySelector("#clear-search-input");
 
 const isLocalStorageTodosExists = localStorage.getItem("todos")
 
@@ -168,4 +170,12 @@ searchTodoInput.oninput = () => {
     searchTodo(searchTodoInput.value)
 }
 
+buttonUp.onclick = () => {
+    window.scrollTo({top: 0});
+};
+
+clearSearchInput.onclick = () => {
+    searchTodoInput.value = "";
+    renderTodos(todos);
+};
 
