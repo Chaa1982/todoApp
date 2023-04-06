@@ -2,7 +2,7 @@ const input = document.querySelector("#todo-creation");
 const button = document.querySelector("#create-todo-button");
 const output = document.querySelector("#output");
 const usersOutput = document.querySelector("#users-output");
-const clearCurentUserButton = document.querySelector("#clear-curent-user");
+const clearCurrentUserButton = document.querySelector("#clear-current-user");
 const searchTodoInput = document.querySelector("#todo-search");
 const buttonUp = document.querySelector("#btn-up");
 const clearSearchInput = document.querySelector("#clear-search-input");
@@ -19,7 +19,7 @@ getServerUsers();
 let users = [];
 console.log(`AllArrUsers = ${users.length}`, users);
 
-let curentUser = undefined;
+let currentUser = undefined;
 
 button.onclick = () => {
 
@@ -45,54 +45,53 @@ localStorage.setItem("todos", JSON.stringify(todos));
         <div class="todo ${todo.done && "done"}">
             <div>
                 <span>${i+1}.</span>
-                <input type="checkbox" ${todo.done && "checked"} class="todo-checkbox" />
+                <input type="checkbox"  class="todo-checkbox" id="${todo.id}" ${todo.done && "checked"} />
                 <span>${todo.text}</span>
             </div>
-            <button class="delete-todo">Delete</button>
+            <button id="${todo.id}" class="delete-todo">Delete</button>
         </div>
         `
     });
 
     const checkboxes = [...document.querySelectorAll(".todo-checkbox")];
 
-    checkboxes.forEach((checkbox, i) => {
+    checkboxes.forEach((checkbox) => {
         checkbox.onchange = () => {
-            const todo = todos[i];
-            changeTodo(todo.text, !todo.done);
-            
-        }
+            const todo = todos.find((todo) => todo.id === +checkbox.id);
+            console.log("!!!todo", checkbox.id);
+            changeTodo(todo.id, !todo.done);
+        };
     });
 
     const deleteButtons = [...document.querySelectorAll(".delete-todo")];
 
-    deleteButtons.forEach((button, i) => {
+    deleteButtons.forEach((button) => {
         button.onclick = () => {
-            const todo = todos[i];
+            const todo = todos.find((todo) => todo.id === +button.id); 
             deleteTodo(todo.text);
-            
-        }
-    })
+        };
+    });
 }
 
-function changeTodo (text, newDone) {
+function changeTodo (id, newDone) {
     todos = todos.map((todo) => {
-        if(text === todo.text) {
-            return { text, done: newDone }
+        if(todo.id === id) {
+            return { ...todo, done: newDone };
         }
         return todo;
     });
-    renderTodos(curentUser ? todos.filter((todo) => todo.userId === curentUser.id) : todos);
+    renderTodos(currentUser ? todos.filter((todo) => todo.userId === currentUser.id) : todos);
 }
 
 function deleteTodo (text) {
     todos = todos.filter((todo) => todo.text !== text);
 
-    renderTodos(curentUser ? todos.filter((todo) => todo.userId === curentUser.id) : todos);
+    renderTodos(currentUser ? todos.filter((todo) => todo.userId === currentUser.id) : todos);
 }
 
 function searchTodo (value) {
-    const filteredTodo = curentUser 
-        ? todos.filter((todo) => todo.text.includes(value) && todo.userId === curentUser.id)
+    const filteredTodo = currentUser 
+        ? todos.filter((todo) => todo.text.includes(value) && todo.userId === currentUser.id)
         : todos.filter((todo) => todo.text.includes(value));
     
     renderTodos(filteredTodo);
@@ -143,8 +142,8 @@ function renderUsres () {
     userButtons.forEach((button, i) => {
         button.onclick = (event) => {
             searchTodoInput.value = "";
-            curentUser = users[i];
-            clearCurentUserButton.disabled = false;
+            currentUser = users[i];
+            clearCurrentUserButton.disabled = false;
 
             //щоб не було декільув видшдених кнопок, спочатку чистемо усі кнопки
             userButtons.forEach((btn) => btn.classList.remove("active-user-button"));
@@ -152,18 +151,23 @@ function renderUsres () {
             //якщо натиснули на кнопку, то так денамічно добавляємо тегу ще один клас 
             event.target.classList.add("active-user-button");
 
-            const todosOfCurentUser = todos.filter((todo) => todo.userId === curentUser.id)
-            renderTodos(todosOfCurentUser);
+            const todosOfCurrentUser = todos.filter((todo) => todo.userId === currentUser.id)
+            renderTodos(todosOfCurrentUser);
         }
     });
 }
 
-clearCurentUserButton.disabled = true;
+clearCurrentUserButton.disabled = true;
 
-clearCurentUserButton.onclick = () => {
-    curentUser = undefined;
+clearCurrentUserButton.onclick = () => {
+    currentUser = undefined;
+    clearCurrentUserButton.disabled = true;
+    
+    const userButtons = [...document.querySelectorAll(".user-todos-button")];
+    userButtons.forEach((btn) => btn.classList.remove("active-user-button"));
+    
     renderTodos(todos);
-}
+    }
 
 searchTodoInput.oninput = () => {
     console.log(searchTodoInput.value);
@@ -171,11 +175,20 @@ searchTodoInput.oninput = () => {
 }
 
 buttonUp.onclick = () => {
-    window.scrollTo({top: 0});
+    window.scrollTo({top: 0, behavior: "smooth"});
 };
 
 clearSearchInput.onclick = () => {
     searchTodoInput.value = "";
-    renderTodos(todos);
+    const todosToRender = currentUser 
+        ? todos.filter((todo) => todo.userId === currentUser.id)
+        : todos;
+ 
+    const userButtons = [...document.querySelectorAll(".user-todos-button")];
+    clearCurrentUserButton.disabled = true;
+    
+    userButtons.forEach((btn) => btn.classList.remove("active-user-button"));
+    
+    renderTodos(todosToRender);
 };
 
